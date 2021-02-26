@@ -10,7 +10,7 @@
 Summary:	XMPP implementation for Python
 Name:		python-%{pypi_name}
 Version:	2.0.1
-Release:	2
+Release:	3
 License:	LGPL v2.1+
 Group:		Libraries/Python
 #Source0:	https://github.com/Jajcus/pyxmpp2/releases/download/2.0.1/pyxmpp2-2.0.1.tar.gz
