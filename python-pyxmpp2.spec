@@ -10,12 +10,15 @@
 Summary:	XMPP implementation for Python
 Name:		python-%{pypi_name}
 Version:	2.0.1
-Release:	6
+Release:	7
 License:	LGPL v2.1+
 Group:		Libraries/Python
 #Source0:	https://github.com/Jajcus/pyxmpp2/releases/download/2.0.1/pyxmpp2-2.0.1.tar.gz
 Source0:	https://github.com/Jajcus/pyxmpp2/archive/%{version}.tar.gz
 # Source0-md5:	add2c546f4473385c7222b623175e6ba
+Patch0:		py.patch
+Patch1:		tls.patch
+Patch2:		newer-setuptools.patch
 URL:		https://github.com/Jajcus/pyxmpp2
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
@@ -27,11 +30,15 @@ BuildRequires:	python-pyasn1
 %endif
 %endif
 %if %{with python3}
+BuildRequires:	python3-2to3
 BuildRequires:	python3-modules
 BuildRequires:	python3-setuptools
 %if %{with tests}
 BuildRequires:	python3-pyasn1
 %endif
+%endif
+%if %{with doc}
+BuildRequires:	epydoc
 %endif
 Requires:	python-dns >= 1.16.0
 Requires:	python-modules
@@ -63,25 +70,45 @@ Dokumentacja API modułu Pythona %{module}.
 
 %prep
 %setup -q -n %{pypi_name}-%{version}
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
 
-%build
+install -d orgsrc
+mv !(orgsrc) orgsrc
 %if %{with python2}
-%py_build %{?with_tests:test}
+cp -a orgsrc python2-src
 %endif
 
 %if %{with python3}
+cp -a orgsrc python3-src
+2to3-%{py3_ver} -w --no-diffs python3-src
+%endif
+
+%build
+%if %{with python2}
+cd python2-src
+%py_build %{?with_tests:test}
+cd ..
+%endif
+
+%if %{with python3}
+cd python3-src
 %py3_build %{?with_tests:test}
+cd ..
 %endif
 
 %if %{with doc}
-cd doc
+cd orgsrc/doc
 %{__make}
+cd ..
 %endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with python2}
+cd python2-src
 %py_install
 
 # when files are installed in other way that standard 'setup.py
@@ -91,24 +118,31 @@ rm -rf $RPM_BUILD_ROOT
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
 
 %py_postclean
+cd ..
 %endif
 
 %if %{with python3}
+cd python3-src
 %py3_install
+cd ..
 %endif
 
 # in case there are examples provided
 %if %{with python2}
+cd python2-src
 install -d $RPM_BUILD_ROOT%{_examplesdir}/python-%{pypi_name}-%{version}
 cp -a examples/*.py $RPM_BUILD_ROOT%{_examplesdir}/python-%{pypi_name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/python-%{pypi_name}-%{version} -name '*.py' \
 	| xargs sed -i '1s|^#!.*python\b|#!%{__python}|'
+cd ..
 %endif
 %if %{with python3}
+cd python3-src
 install -d $RPM_BUILD_ROOT%{_examplesdir}/python3-%{pypi_name}-%{version}
 cp -a examples/*.py $RPM_BUILD_ROOT%{_examplesdir}/python3-%{pypi_name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/python3-%{pypi_name}-%{version} -name '*.py' \
 	| xargs sed -i '1s|^#!.*python\b|#!%{__python3}|'
+cd ..
 %endif
 
 %clean
@@ -117,7 +151,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python2}
 %files
 %defattr(644,root,root,755)
-%doc README.rst TODO
+%doc orgsrc/{README.rst,TODO}
 %{py_sitescriptdir}/%{module}
 %{py_sitescriptdir}/%{egg_name}-%{version}-py*.egg-info
 %{_examplesdir}/python-%{pypi_name}-%{version}
@@ -126,7 +160,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python3}
 %files -n python3-%{pypi_name}
 %defattr(644,root,root,755)
-%doc README.rst TODO
+%doc orgsrc/{README.rst,TODO}
 %{py3_sitescriptdir}/%{module}
 %{py3_sitescriptdir}/%{egg_name}-%{version}-py*.egg-info
 %{_examplesdir}/python3-%{pypi_name}-%{version}
@@ -135,5 +169,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with doc}
 %files apidocs
 %defattr(644,root,root,755)
-%doc doc/www/api/*
+%doc orgsrc/doc/www/api/*
 %endif

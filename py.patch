@@ -1,0 +1,30 @@
+diff -urN pyxmpp2-2.0.1.org/pyxmpp2/roster.py pyxmpp2-2.0.1/pyxmpp2/roster.py
+--- pyxmpp2-2.0.1.org/pyxmpp2/roster.py	2017-11-27 21:15:25.000000000 +0100
++++ pyxmpp2-2.0.1/pyxmpp2/roster.py	2022-05-26 10:24:41.759970881 +0200
+@@ -40,7 +40,10 @@
+ 
+ import logging
+ 
+-from collections import Sequence, Mapping
++try:
++    from collections.abc import Sequence, Mapping
++except ImportError:
++    from collections import Sequence, Mapping
+ 
+ from .etree import ElementTree
+ from .settings import XMPPSettings
+diff -urN pyxmpp2-2.0.1.org/pyxmpp2/settings.py pyxmpp2-2.0.1/pyxmpp2/settings.py
+--- pyxmpp2-2.0.1.org/pyxmpp2/settings.py	2017-11-27 21:15:25.000000000 +0100
++++ pyxmpp2-2.0.1/pyxmpp2/settings.py	2022-05-26 10:25:09.986637542 +0200
+@@ -40,7 +40,10 @@
+ import argparse
+ import logging
+ 
+-from collections import MutableMapping
++try:
++    from collections.abc import MutableMapping
++except ImportError:
++    from collections import MutableMapping
+ 
+ logger = logging.getLogger("pyxmpp2.settings")
+ 

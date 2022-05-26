@@ -1,0 +1,11 @@
+--- pyxmpp2-2.0.1/pyxmpp2/streamtls.py~	2017-11-27 21:15:25.000000000 +0100
++++ pyxmpp2-2.0.1/pyxmpp2/streamtls.py	2022-05-26 10:25:42.639970868 +0200
+@@ -178,7 +178,7 @@ class StreamTLSHandler(StreamFeatureHand
+                     certfile = self.settings["tls_cert_file"],
+                     server_side = not self.stream.initiator,
+                     cert_reqs = cert_reqs,
+-                    ssl_version = ssl.PROTOCOL_TLSv1,
++                    ssl_version = ssl.PROTOCOL_TLS,
+                     ca_certs = self.settings["tls_cacert_file"],
+                     do_handshake_on_connect = False,
+                     )
