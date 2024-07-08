@@ -10,7 +10,7 @@
 Summary:	XMPP implementation for Python
 Name:		python-%{pypi_name}
 Version:	2.0.1
-Release:	10
+Release:	11
 License:	LGPL v2.1+
 Group:		Libraries/Python
 #Source0:	https://github.com/Jajcus/pyxmpp2/releases/download/2.0.1/pyxmpp2-2.0.1.tar.gz
@@ -74,6 +74,8 @@ Dokumentacja API modułu Pythona %{module}.
 %patch1 -p1
 %patch2 -p1
 
+find . -type f -exec sed -i 's|^#![[:space:]]*/usr/bin/python\(\S*\)|#!/usr/bin/python2\1|' "{}" ";"
+
 install -d orgsrc
 mv !(orgsrc) orgsrc
 %if %{with python2}
@@ -106,7 +108,7 @@ cd ..
 
 %if %{with doc}
 cd orgsrc/doc
-%{__make}
+%{__make} PYTHON="%{__python}"
 cd ..
 %endif
 
