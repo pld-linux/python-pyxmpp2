@@ -70,9 +70,9 @@ Dokumentacja API modułu Pythona %{module}.
 
 %prep
 %setup -q -n %{pypi_name}-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch -P 0 -p1
+%patch -P 1 -p1
+%patch -P 2 -p1
 
 find . -type f -exec sed -i 's|^#![[:space:]]*/usr/bin/python\(\S*\)|#!/usr/bin/python2\1|' "{}" ";"
 
