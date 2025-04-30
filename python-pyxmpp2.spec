@@ -10,7 +10,7 @@
 Summary:	XMPP implementation for Python
 Name:		python-%{pypi_name}
 Version:	2.0.1
-Release:	13
+Release:	14
 License:	LGPL v2.1+
 Group:		Libraries/Python
 #Source0:	https://github.com/Jajcus/pyxmpp2/releases/download/2.0.1/pyxmpp2-2.0.1.tar.gz
@@ -30,7 +30,7 @@ BuildRequires:	python-pyasn1
 %endif
 %endif
 %if %{with python3}
-BuildRequires:	python3-2to3
+BuildRequires:	python3-fissix
 BuildRequires:	python3-modules
 BuildRequires:	python3-setuptools
 %if %{with tests}
@@ -84,7 +84,7 @@ cp -a orgsrc python2-src
 
 %if %{with python3}
 cp -a orgsrc python3-src
-2to3-%{py3_ver} -w --no-diffs python3-src
+%{__python3} -m fissix -w --no-diffs python3-src
 sed -i -e 's#def __unicode__(#def __str__(#g' \
     python3-src/pyxmpp2/*.py \
     python3-src/auxtools/make_conformance_table.py \
