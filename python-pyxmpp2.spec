@@ -10,7 +10,7 @@
 Summary:	XMPP implementation for Python
 Name:		python-%{pypi_name}
 Version:	2.0.1
-Release:	14
+Release:	15
 License:	LGPL v2.1+
 Group:		Libraries/Python
 #Source0:	https://github.com/Jajcus/pyxmpp2/releases/download/2.0.1/pyxmpp2-2.0.1.tar.gz
@@ -19,6 +19,8 @@ Source0:	https://github.com/Jajcus/pyxmpp2/archive/%{version}.tar.gz
 Patch0:		py.patch
 Patch1:		tls.patch
 Patch2:		newer-setuptools.patch
+Patch3:		ssl-context.patch
+Patch4:		is-closed-syntaxwarning.patch
 URL:		https://github.com/Jajcus/pyxmpp2
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
@@ -73,6 +75,8 @@ Dokumentacja API modułu Pythona %{module}.
 %patch -P 0 -p1
 %patch -P 1 -p1
 %patch -P 2 -p1
+%patch -P 3 -p1
+%patch -P 4 -p1
 
 find . -type f -exec sed -i 's|^#![[:space:]]*/usr/bin/python\(\S*\)|#!/usr/bin/python2\1|' "{}" ";"
 

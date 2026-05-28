@@ -1,0 +1,43 @@
+--- pyxmpp2-2.0.1/pyxmpp2/transport.py.orig
++++ pyxmpp2-2.0.1/pyxmpp2/transport.py
+@@ -653,14 +653,38 @@
+                 raise ValueError("Not TLS-connected")
+             return get_certificate_from_ssl_socket(self._socket)
+ 
++    # ssl.wrap_socket() was removed in Python 3.12; emulate the legacy
++    # kwargs API via SSLContext (available on Python 2.7.9+ and 3.x).
+     def _initiate_starttls(self, **kwargs):
+         """Initiate starttls handshake over the socket.
+         """
+         if self._tls_state == "connected":
+             raise RuntimeError("Already TLS-connected")
+-        kwargs["do_handshake_on_connect"] = False
+         logger.debug("Wrapping the socket into ssl")
+-        self._socket = ssl.wrap_socket(self._socket, **kwargs)
++        server_side = kwargs.pop("server_side", False)
++        keyfile = kwargs.pop("keyfile", None)
++        certfile = kwargs.pop("certfile", None)
++        cert_reqs = kwargs.pop("cert_reqs", ssl.CERT_NONE)
++        ca_certs = kwargs.pop("ca_certs", None)
++        ssl_version = kwargs.pop("ssl_version", None)
++        kwargs.pop("do_handshake_on_connect", None)
++        # Prefer PROTOCOL_TLS_(CLIENT|SERVER) on Python 3.6+; fall back to
++        # the caller's ssl_version or ssl.PROTOCOL_TLS on Python 2.7.
++        proto = getattr(ssl,
++                "PROTOCOL_TLS_SERVER" if server_side else "PROTOCOL_TLS_CLIENT",
++                None)
++        if proto is None:
++            proto = ssl_version if ssl_version is not None else ssl.PROTOCOL_TLS
++        ctx = ssl.SSLContext(proto)
++        ctx.check_hostname = False
++        ctx.verify_mode = cert_reqs
++        if certfile:
++            ctx.load_cert_chain(certfile, keyfile)
++        if ca_certs:
++            ctx.load_verify_locations(cafile=ca_certs)
++        self._socket = ctx.wrap_socket(self._socket,
++                                       server_side=server_side,
++                                       do_handshake_on_connect=False)
+         self._set_state("tls-handshake")
+         self._continue_tls_handshake()
+ 
